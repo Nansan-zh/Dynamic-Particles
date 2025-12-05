@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>灵动粒子 By Haemorr</title>
-    <!-- 网页图标 (Favicon) - 简约粒子簇 -->
+    <title>3D 灵动粒子 - 智控终极版</title>
+    
     <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><circle cx="12" cy="16" r="7" fill="%236c5ce7"/><circle cx="24" cy="10" r="4" fill="%2300f3ff"/><circle cx="22" cy="24" r="3" fill="%23ff7675"/></svg>'>
+
     <style>
         :root {
-            /* 基础变量 */
-            --glass-bg: rgba(255, 255, 255, 0.85);
-            --glass-border: rgba(255, 255, 255, 0.9);
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.8);
             --text-main: #2d3436;
             --text-sub: #636e72;
             --primary: #6c5ce7;
-            --sidebar-width: 260px;
+            --sidebar-width: 280px;
             --sidebar-collapsed-width: 72px; 
             --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
             --item-hover: rgba(0,0,0,0.06);
@@ -22,15 +22,14 @@
             --active-text: #ffffff;
         }
 
-        /* 深色模式变量 */
         body.dark-mode {
-            --glass-bg: rgba(15, 23, 42, 0.75);
-            --glass-border: rgba(255, 255, 255, 0.15);
-            --text-main: #dfe6e9;
-            --text-sub: #b2bec3;
+            --glass-bg: rgba(30, 30, 30, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #f1f2f6;
+            --text-sub: #a4b0be;
             --primary: #00f3ff;
             --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
-            --item-hover: rgba(255,255,255,0.15);
+            --item-hover: rgba(255,255,255,0.1);
             --divider-color: rgba(255,255,255,0.15);
             --active-text: #000000;
         }
@@ -40,24 +39,21 @@
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             color: var(--text-main);
             transition: color 0.5s ease; 
-            /* 禁止移动端双击缩放 */
             touch-action: none;
         }
 
-        /* --- 背景层 --- */
         .bg-layer {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 0; transition: opacity 0.8s ease-in-out;
         }
         #bg-light { background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%); opacity: 1; }
-        #bg-dark { background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%); opacity: 0; }
+        #bg-dark { background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 50%, #1a1a1a 100%); opacity: 0; }
+        
         body.dark-mode #bg-light { opacity: 0; }
         body.dark-mode #bg-dark { opacity: 1; }
 
-        /* --- 3D 画布 --- */
         #canvas-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; }
 
-        /* --- 侧边栏 --- */
         #sidebar {
             position: fixed; top: 20px; bottom: 20px; left: 20px;
             width: var(--sidebar-width);
@@ -73,7 +69,6 @@
         }
         #sidebar.collapsed { width: var(--sidebar-collapsed-width); }
 
-        /* 头部 */
         .sidebar-header {
             padding: 20px; display: flex; align-items: center; justify-content: space-between;
             min-height: 44px; border-bottom: 1px solid var(--divider-color);
@@ -93,24 +88,20 @@
         #sidebar.collapsed .toggle-btn { margin: 0 auto; }
         .toggle-btn:hover { background: var(--item-hover); }
 
-        /* 内容区 */
         .sidebar-content {
             flex: 1; padding: 15px; overflow-y: auto; overflow-x: hidden;
             display: flex; flex-direction: column; gap: 0; 
         }
         .sidebar-content::-webkit-scrollbar { width: 0; }
 
-        /* --- 分割线 (修复居中) --- */
         .divider {
             width: 100%; height: 1px; background: var(--divider-color);
             margin: 15px 0; flex-shrink: 0; transition: all 0.3s;
         }
         #sidebar.collapsed .divider { width: 24px; margin: 15px auto; } 
 
-        /* 控件组 */
         .control-group { display: flex; flex-direction: column; gap: 10px; }
 
-        /* 组标题 */
         .group-header {
             display: flex; align-items: center; 
             color: var(--text-sub); font-size: 0.85rem; font-weight: 600;
@@ -120,7 +111,6 @@
         #sidebar.collapsed .group-header:hover { background: var(--item-hover); }
         .group-label { white-space: nowrap; transition: opacity 0.2s; }
         
-        /* 图标容器：确保所有图标左对齐一致 */
         .icon-box {
             width: 32px; display: flex; justify-content: center; align-items: center;
             font-size: 1rem; flex-shrink: 0; margin-right: 4px;
@@ -128,7 +118,6 @@
         #sidebar.collapsed .icon-box { margin-right: 0; }
         #sidebar.collapsed .group-label { display: none; }
 
-        /* --- 摄像头总开关按钮 (完美对齐版) --- */
         .cam-switch-btn {
             width: 100%; height: 42px; padding: 0 12px;
             border-radius: 12px; border: 1px solid var(--glass-border);
@@ -145,12 +134,10 @@
             font-size: 1.1rem; flex-shrink: 0; margin-right: 4px;
         }
         .cam-text { line-height: 1; padding-top: 1px; white-space: nowrap; }
-
         #sidebar.collapsed .cam-switch-btn { width: 42px; padding: 0; justify-content: center; margin: 0 auto; }
         #sidebar.collapsed .cam-icon-wrapper { margin-right: 0; }
         #sidebar.collapsed .cam-text { display: none; }
 
-        /* --- 形状按钮 --- */
         .shape-list { display: flex; flex-direction: column; gap: 6px; }
         .shape-btn {
             display: flex; align-items: center; height: 42px; padding: 0 12px;
@@ -173,24 +160,29 @@
         #sidebar.collapsed .shape-icon { margin-right: 0; }
         #sidebar.collapsed .shape-text { display: none; }
 
-        /* 颜色选择器 */
-        .color-wrapper {
-            width: 100%; height: 36px; border-radius: 10px; overflow: hidden;
-            position: relative; cursor: pointer; border: 1px solid rgba(150,150,150, 0.3);
+        .color-picker-wrapper {
+            width: 100%; height: 40px; border-radius: 12px; position: relative;
+            background: var(--item-hover); border: 1px solid var(--glass-border);
+            display: flex; align-items: center; padding: 4px; box-sizing: border-box;
+            cursor: pointer; transition: all 0.2s;
         }
-        input[type="color"] {
-            border: none; width: 200%; height: 200%;
-            position: absolute; top: -50%; left: -50%; cursor: pointer;
+        .color-picker-wrapper:hover { background: rgba(150,150,150, 0.1); }
+        #current-color-display {
+            flex: 1; height: 100%; border-radius: 8px; background-color: var(--primary);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1); transition: background-color 0.2s; position: relative;
         }
+        #native-color-input { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 2; }
+        .color-tip { font-size: 0.8rem; color: var(--text-sub); margin-left: 10px; margin-right: 5px; white-space: nowrap; }
+        #sidebar.collapsed .color-picker-wrapper { width: 42px; height: 42px; padding: 0; justify-content: center; margin: 0 auto; }
+        #sidebar.collapsed #current-color-display { width: 24px; height: 24px; flex: none; border-radius: 50%; }
+        #sidebar.collapsed .color-tip { display: none; }
 
-        /* 说明 */
         .instruction-box {
             font-size: 0.8rem; color: var(--text-sub); line-height: 1.6;
             background: var(--item-hover); padding: 12px; border-radius: 12px;
         }
         #sidebar.collapsed .instruction-box { display: none; }
 
-        /* 底部主题 */
         .theme-wrapper { padding: 15px; border-top: 1px solid var(--divider-color); }
         .theme-btn {
             width: 100%; height: 44px; border-radius: 12px;
@@ -203,39 +195,27 @@
         #sidebar.collapsed .theme-btn { padding: 0; }
         #sidebar.collapsed .theme-text { display: none; }
 
-        /* 摄像头容器与占位符 */
-        #video-container {
-            position: fixed; bottom: 20px; right: 20px;
-            width: 160px; height: 120px; z-index: 10;
-        }
+        #video-container { position: fixed; bottom: 20px; right: 20px; width: 160px; height: 120px; z-index: 10; }
         #video-feed {
-            position: absolute; top: 0; left: 0;
-            width: 100%; height: 100%;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             border-radius: 16px; object-fit: cover; transform: scaleX(-1);
             border: 3px solid var(--primary); box-shadow: var(--shadow);
-            opacity: 0.9; 
-            display: none; background: #000;
+            opacity: 0.9; display: none; background: #000;
         }
-        /* 新增：骨骼绘制层 */
         #output-canvas {
-            position: absolute; top: 0; left: 0;
-            width: 100%; height: 100%;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             border-radius: 16px; object-fit: cover; transform: scaleX(-1);
-            pointer-events: none; z-index: 11;
-            display: none; /* 默认隐藏 */
+            pointer-events: none; z-index: 11; display: none; 
         }
-        
         #camera-placeholder {
             width: 100%; height: 100%;
             border-radius: 16px; background: rgba(0,0,0,0.1);
             backdrop-filter: blur(5px); border: 2px dashed var(--text-sub);
             display: flex; align-items: center; justify-content: center; flex-direction: column;
-            color: var(--text-sub); font-size: 0.8rem;
-            box-sizing: border-box;
+            color: var(--text-sub); font-size: 0.8rem; box-sizing: border-box;
         }
         .cam-off-icon { font-size: 1.5rem; opacity: 0.5; margin-bottom: 5px; }
 
-        /* 加载 */
         #loader {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #fff; z-index: 999; display: flex; flex-direction: column;
@@ -268,7 +248,6 @@
 
         <div class="sidebar-content">
             
-            <!-- 摄像头总开关 -->
             <div class="control-group">
                 <button class="cam-switch-btn" id="cam-toggle-btn" title="开启/关闭手势识别">
                     <div class="cam-icon-wrapper">📷</div>
@@ -278,61 +257,61 @@
 
             <div class="divider"></div>
 
-            <!-- 模型选择 -->
             <div class="control-group">
                 <div class="group-header" title="点击展开">
                     <div class="icon-box">💠</div>
                     <span class="group-label">模型形态</span>
                 </div>
                 <div class="shape-list">
-                    <button class="shape-btn active" data-shape="heart">
-                        <div class="shape-icon">❤</div><span class="shape-text">挚爱之心</span>
+                    <button class="shape-btn active" data-shape="heart" id="btn-heart">
+                        <div class="shape-icon">❤️</div><span class="shape-text">挚爱之心</span>
                     </button>
-                    <button class="shape-btn" data-shape="saturn">
-                        <div class="shape-icon">🪐</div><span class="shape-text">浩瀚星环</span>
+                    <button class="shape-btn" data-shape="galaxy" id="btn-galaxy">
+                        <div class="shape-icon">🌌</div><span class="shape-text">浩瀚银河</span>
                     </button>
-                    <button class="shape-btn" data-shape="flower">
-                        <div class="shape-icon">🌸</div><span class="shape-text">梦幻繁花</span>
+                    <button class="shape-btn" data-shape="flower" id="btn-flower">
+                        <div class="shape-icon">🌹</div><span class="shape-text">繁花盛宴</span>
                     </button>
-                    <button class="shape-btn" data-shape="dna">
+                    <button class="shape-btn" data-shape="forest" id="btn-forest">
+                        <div class="shape-icon">🌲</div><span class="shape-text">迷雾森林</span>
+                    </button>
+                    <button class="shape-btn" data-shape="dna" id="btn-dna">
                         <div class="shape-icon">🧬</div><span class="shape-text">生命螺旋</span>
-                    </button>
-                    <button class="shape-btn" data-shape="face">
-                        <div class="shape-icon">😀</div><span class="shape-text">赛博笑脸</span>
                     </button>
                 </div>
             </div>
 
             <div class="divider"></div>
 
-            <!-- 颜色 -->
             <div class="control-group">
                 <div class="group-header" title="点击展开">
                     <div class="icon-box">🎨</div>
                     <span class="group-label">粒子色彩</span>
                 </div>
-                <div class="color-wrapper" title="点击更改颜色">
-                    <input type="color" id="color-picker" value="#6c5ce7">
+                <div class="color-picker-wrapper" title="点击选择任意颜色">
+                    <div id="current-color-display"></div>
+                    <div class="color-tip">点击切换</div>
+                    <input type="color" id="native-color-input" value="#6c5ce7">
                 </div>
             </div>
 
             <div class="divider"></div>
 
-            <!-- 指南 -->
             <div class="control-group">
                 <div class="group-header" title="点击展开">
                     <div class="icon-box">ℹ️</div>
                     <span class="group-label">操作指南</span>
                 </div>
                 <div class="instruction-box">
-                    👋 <b>张合手掌</b>: 缩放粒子<br>
-                    ✋ <b>移动手腕</b>: 3D旋转<br>
+                    👋 <b>缩放</b>: 张开/捏合手掌<br>
+                    ✋ <b>旋转</b>: 移动手腕位置<br>
+                    ✊ <b>锁定</b>: 左手握拳锁旋转<br>
+                    🙌 <b>重置</b>: 双手同时握拳
                 </div>
             </div>
 
         </div>
 
-        <!-- 底部主题 -->
         <div class="theme-wrapper">
             <button class="theme-btn" id="theme-btn" title="切换显示模式">
                 <span id="theme-icon" style="font-size: 1.1rem">☀</span>
@@ -341,13 +320,11 @@
         </div>
     </nav>
 
-    <!-- 摄像头预览区域 -->
     <div id="video-container">
         <div id="camera-placeholder">
             <div class="cam-off-icon">📷⃠</div>
             <div>已关闭</div>
         </div>
-        <!-- 关键：muted autoplay 用于兼容安卓/iOS 自动播放策略 -->
         <video id="video-feed" playsinline muted autoplay></video>
         <canvas id="output-canvas"></canvas>
     </div>
@@ -364,62 +341,137 @@
             document.body.appendChild(s);
         });
 
-        // 全局变量
         let scene, camera, renderer, particles, geometry, material;
-        // 性能适配：手机端减少粒子数量
         const isMobileDevice = window.innerWidth < 768;
-        const particleCount = isMobileDevice ? 8000 : 22000;
+        const particleCount = isMobileDevice ? 8000 : 25000;
         
         let isDarkMode = false;
-        
-        // 交互状态
+        let currentShape = 'heart'; 
         let targetScale = 1; let currentScale = 1;
         let targetRotationX = 0, targetRotationY = 0;
         let currentRotationX = 0, currentRotationY = 0;
         let clock = new THREE.Clock();
 
-        // 摄像头控制变量
         let cameraUtils = null; 
         let isCameraActive = false;
         let handDetected = false;
+        let sidebarAutoCloseTimer = null; // [新增] 侧边栏自动收起定时器
 
-        // 形状生成
         const Shapes = {
             heart: (i) => {
-                const t = Math.random() * Math.PI * 2;
-                const x = 16 * Math.pow(Math.sin(t), 3);
-                const y = 13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t);
-                const scale = 0.25;
-                const z = (Math.random() - 0.5) * 15 * (1 - Math.abs(y)/20); 
-                return new THREE.Vector3(x * scale, y * scale, z * scale);
+                const u = Math.random() * Math.PI * 2;
+                const v = Math.random() * Math.PI; 
+                const x = 16 * Math.pow(Math.sin(u), 3) * Math.sin(v);
+                const y = (13 * Math.cos(u) - 5 * Math.cos(2*u) - 2 * Math.cos(3*u) - Math.cos(4*u)) * Math.sin(v);
+                const z = 6 * Math.cos(v); 
+                return new THREE.Vector3(x * 0.22, y * 0.22, z * 0.22);
             },
-            saturn: (i) => {
-                const r = Math.random();
-                if (r > 0.45) {
-                    const theta = Math.random() * Math.PI * 2; const phi = Math.acos((Math.random() * 2) - 1); const rad = 2.0;
-                    return new THREE.Vector3(rad * Math.sin(phi) * Math.cos(theta), rad * Math.sin(phi) * Math.sin(theta), rad * Math.cos(phi));
-                } else {
-                    const theta = Math.random() * Math.PI * 2; const rad = 3.2 + Math.random() * 2.8; 
-                    return new THREE.Vector3(rad * Math.cos(theta), (Math.random() - 0.5) * 0.15, rad * Math.sin(theta));
+            galaxy: (i) => {
+                const arms = 3; const armWidth = 0.8; 
+                const isCore = Math.random() < 0.25;
+                if (isCore) {
+                    const theta = Math.random() * Math.PI * 2;
+                    const phi = Math.acos(2 * Math.random() - 1);
+                    const r = Math.pow(Math.random(), 1/3) * 1.5;
+                    return new THREE.Vector3(r * Math.sin(phi) * Math.cos(theta), r * Math.cos(phi) * 0.4, r * Math.sin(phi) * Math.sin(theta));
                 }
+                const spin = i * 0.0002;
+                const armIndex = i % arms;
+                const armAngle = (armIndex / arms) * Math.PI * 2;
+                const dist = Math.pow(Math.random(), 2) * 9 + 0.5; 
+                const angle = armAngle + dist * 0.5 + (Math.random() - 0.5) * armWidth;
+                const x = Math.cos(angle) * dist;
+                const z = Math.sin(angle) * dist;
+                const height = (Math.random() - 0.5) * (2.5 / (dist * 0.5 + 0.1)); 
+                return new THREE.Vector3(x, height, z);
             },
             flower: (i) => {
-                const theta = Math.random() * Math.PI * 2; const phi = Math.random() * Math.PI; const r = 3.5 * Math.cos(5 * theta) + 1; 
-                return new THREE.Vector3(r * Math.sin(phi) * Math.cos(theta), r * Math.cos(phi), r * Math.sin(phi) * Math.sin(theta));
+                const layerCount = 6; 
+                const t = Math.pow(Math.random(), 0.6); 
+                const layerIndex = Math.floor(t * layerCount);
+                const progress = (layerIndex + Math.random()) / layerCount;
+                const baseR = 0.5 + progress * 3.5;
+                const u = Math.random() * Math.PI * 2;
+                const petals = 6;
+                const waveAmp = 0.2 + progress * 0.4;
+                const offset = layerIndex * (Math.PI / petals);
+                const r = baseR * (1 + waveAmp * Math.sin(petals * u + offset));
+                let y = (1 - progress) * 2.0;
+                const curl = Math.sin(petals * u + offset);
+                if (progress > 0.6) y -= curl * 0.3 * progress; else y += curl * 0.1;
+                y += (Math.random() - 0.5) * 0.15;
+                const x = r * Math.cos(u); const z = r * Math.sin(u);
+                return new THREE.Vector3(x, y - 1, z);
+            },
+            forest: (i) => {
+                const treeCount = 60; const bushCount = 40; 
+                const rand = Math.random();
+                if (rand < 0.65) {
+                    const treeIdx = i % treeCount;
+                    const angle = treeIdx * 2.39996; const dist = 4.0 * Math.sqrt(treeIdx + 1);
+                    const tx = Math.cos(angle) * dist; const tz = Math.sin(angle) * dist;
+                    const pseudoRand = Math.sin(treeIdx * 999);
+                    const heightScale = 1.0 + 0.5 * pseudoRand;
+                    if (Math.random() < 0.25) {
+                        const h = Math.random() * 2.0 * heightScale;
+                        const r = 0.2 + (2.0 - h) * 0.05;
+                        const theta = Math.random() * Math.PI * 2;
+                        return new THREE.Vector3(tx + r*Math.cos(theta), h - 4, tz + r*Math.sin(theta));
+                    } else {
+                        const crownY = -2.5 + 2.0 * heightScale; 
+                        const r = Math.pow(Math.random(), 1/3);
+                        const theta = Math.random() * Math.PI * 2;
+                        const phi = Math.acos(2 * Math.random() - 1);
+                        const crownRad = 1.3 + 0.3 * pseudoRand;
+                        return new THREE.Vector3(tx + r * crownRad * Math.sin(phi) * Math.cos(theta), crownY + r * crownRad * Math.cos(phi) * 1.3, tz + r * crownRad * Math.sin(phi) * Math.sin(theta));
+                    }
+                } else if (rand < 0.90) {
+                    const bushIdx = (i * 17) % bushCount;
+                    const seed = bushIdx * 654.321;
+                    const bx = (Math.sin(seed) * 22); const bz = (Math.cos(seed * 0.9) * 22);
+                    const br = 0.7 + 0.3 * Math.sin(seed); 
+                    const r = Math.pow(Math.random(), 1/3) * br;
+                    const theta = Math.random() * Math.PI * 2;
+                    const phi = Math.random() * Math.PI / 2;
+                    return new THREE.Vector3(bx + r * Math.sin(phi) * Math.cos(theta), -4 + r * Math.cos(phi) * 0.7, bz + r * Math.sin(phi) * Math.sin(theta));
+                } else {
+                    const x = (Math.random() - 0.5) * 60; const z = (Math.random() - 0.5) * 60;
+                    return new THREE.Vector3(x, -4, z);
+                }
             },
             dna: (i) => {
-                const t = Math.random() * 20 - 10; const angle = t * 2.5; const strand = Math.random() > 0.5 ? 0 : Math.PI; 
-                const x = 1.8 * Math.cos(angle + strand) + (Math.random()-0.5)*0.6; const z = 1.8 * Math.sin(angle + strand) + (Math.random()-0.5)*0.6;
-                return new THREE.Vector3(x, t, z);
-            },
-            face: (i) => {
-                const r = Math.random();
-                if (r < 0.1) { const th=Math.random()*6.28; return new THREE.Vector3(-1.5+Math.cos(th)*0.6, 1+Math.sin(th)*0.6, 0); }
-                else if (r < 0.2) { const th=Math.random()*6.28; return new THREE.Vector3(1.5+Math.cos(th)*0.6, 1+Math.sin(th)*0.6, 0); }
-                else if (r < 0.35) { const th=3.14+Math.random()*3.14; return new THREE.Vector3(2.2*Math.cos(th), 2.2*Math.sin(th)+0.5, 0); }
-                else { const th=Math.random()*6.28; return new THREE.Vector3(4.5*Math.cos(th), 4.5*Math.sin(th), 0); }
+                const len = 18; const t = Math.random() * len - len/2; 
+                const angle = t * 2.5; const type = Math.random();
+                if (type < 0.7) {
+                    const strand = Math.random() > 0.5 ? 0 : Math.PI; 
+                    const x = 2.0 * Math.cos(angle + strand) + (Math.random()-0.5)*0.4;
+                    const z = 2.0 * Math.sin(angle + strand) + (Math.random()-0.5)*0.4;
+                    return new THREE.Vector3(x, t, z);
+                } else {
+                    const segment = Math.floor((t + len/2) * 2);
+                    if (segment % 3 === 0) {
+                        const alpha = Math.random();
+                        const x1 = 2.0 * Math.cos(angle); const z1 = 2.0 * Math.sin(angle);
+                        const x2 = 2.0 * Math.cos(angle + Math.PI); const z2 = 2.0 * Math.sin(angle + Math.PI);
+                        return new THREE.Vector3(x1 + (x2-x1)*alpha, t, z1 + (z2-z1)*alpha);
+                    } else return new THREE.Vector3(0,0,0);
+                }
             }
         };
+
+        function createParticleTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 32; canvas.height = 32;
+            const ctx = canvas.getContext('2d');
+            const grad = ctx.createRadialGradient(16, 16, 0, 16, 16, 16);
+            grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+            grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, 32, 32);
+            const texture = new THREE.Texture(canvas);
+            texture.needsUpdate = true;
+            return texture;
+        }
 
         function initScene() {
             const container = document.getElementById('canvas-container');
@@ -461,11 +513,9 @@
 
             material = new THREE.PointsMaterial({
                 size: 0.12, vertexColors: true, blending: THREE.NormalBlending,
-                depthWrite: false, transparent: true, opacity: 0.8
+                depthWrite: false, transparent: true, opacity: 0.8,
+                map: createParticleTexture()
             });
-
-            const texture = new THREE.TextureLoader().load('https://threejs.org/examples/textures/sprites/circle.png');
-            material.map = texture;
 
             particles = new THREE.Points(geometry, material);
             scene.add(particles);
@@ -527,22 +577,32 @@
         function initUI() {
             const sidebar = document.getElementById('sidebar');
             const toggleBtn = document.getElementById('sidebar-toggle');
-
-            // 1. 折叠逻辑
+            
             toggleBtn.addEventListener('click', () => sidebar.classList.toggle('collapsed'));
 
-            // 2. 形状切换
+            // 点击外部自动收起
+            document.addEventListener('click', (e) => {
+                if (!sidebar.classList.contains('collapsed') && 
+                    !sidebar.contains(e.target) && 
+                    !toggleBtn.contains(e.target)) {
+                    sidebar.classList.add('collapsed');
+                }
+            });
+
             const shapeBtns = document.querySelectorAll('.shape-btn');
             shapeBtns.forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     shapeBtns.forEach(b => b.classList.remove('active'));
                     const target = e.target.closest('.shape-btn');
                     target.classList.add('active');
-                    generateTargetPositions(target.dataset.shape);
+                    const newShape = target.dataset.shape;
+                    if (newShape !== currentShape) {
+                        currentShape = newShape;
+                        generateTargetPositions(newShape);
+                    }
                 });
             });
 
-            // 3. 点击折叠后的图标展开
             const groupHeaders = document.querySelectorAll('.group-header');
             groupHeaders.forEach(header => {
                 header.addEventListener('click', () => {
@@ -552,21 +612,25 @@
                 });
             });
 
-            // 4. 颜色
-            const picker = document.getElementById('color-picker');
-            picker.addEventListener('input', (e) => {
-                const c = new THREE.Color(e.target.value);
+            const colorInput = document.getElementById('native-color-input');
+            const colorDisplay = document.getElementById('current-color-display');
+            
+            colorInput.addEventListener('input', (e) => {
+                const hex = e.target.value;
+                colorDisplay.style.backgroundColor = hex;
+                document.documentElement.style.setProperty('--primary', hex);
+                const c = new THREE.Color(hex);
+                const hsl = {}; c.getHSL(hsl); const isLight = hsl.l > 0.8; 
                 const colors = geometry.attributes.color;
                 for(let i=0; i<particleCount; i++) {
                     const temp = c.clone();
-                    temp.offsetHSL(0,0,(Math.random()-0.5)*0.2);
+                    const offset = isLight ? (Math.random() * 0.1) : (Math.random()-0.5)*0.2;
+                    temp.offsetHSL(0, 0, offset);
                     colors.setXYZ(i, temp.r, temp.g, temp.b);
                 }
                 colors.needsUpdate = true;
-                document.documentElement.style.setProperty('--primary', e.target.value);
             });
 
-            // 5. 深色模式
             const themeBtn = document.getElementById('theme-btn');
             const themeIcon = document.getElementById('theme-icon');
             const themeText = themeBtn.querySelector('.theme-text');
@@ -577,7 +641,7 @@
                 
                 if (isDarkMode) {
                     themeIcon.innerText = '🌙'; themeText.innerText = '当前：深色模式';
-                    scene.fog.color.set(0x102027); 
+                    scene.fog.color.set(0x1a1a1a); 
                     material.blending = THREE.AdditiveBlending; material.opacity = 0.6;
                 } else {
                     themeIcon.innerText = '☀'; themeText.innerText = '当前：浅色模式';
@@ -588,75 +652,138 @@
             });
         }
 
-        // --- AI 与 摄像头核心逻辑 (全平台适配版) ---
         async function initAI() {
             await loadScript('https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js');
             await loadScript('https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js');
-            await loadScript('https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js'); // 用于绘制骨骼
+            await loadScript('https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js');
             await loadScript('https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js');
 
             const videoElement = document.getElementById('video-feed');
             const canvasElement = document.getElementById('output-canvas');
             const canvasCtx = canvasElement.getContext('2d');
-            
             const placeholder = document.getElementById('camera-placeholder');
             const camBtn = document.getElementById('cam-toggle-btn');
             const camText = document.getElementById('cam-btn-text');
+            const sidebar = document.getElementById('sidebar');
 
             const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
             
             hands.setOptions({
-                maxNumHands: 1,
+                maxNumHands: 2, // 开启双手支持
                 modelComplexity: 1, 
-                minDetectionConfidence: 0.4, // 降低门槛适配平板
+                minDetectionConfidence: 0.4, 
                 minTrackingConfidence: 0.5
             });
+
+            // 简单的握拳检测函数
+            function isFist(landmarks) {
+                // 判断四个手指指尖是否低于指根关节（y坐标更大）
+                // 坐标系：y向下为正
+                // 注意：这适用于手掌向着摄像头（常规操作）
+                // 食指: 8 tip, 6 pip
+                // 中指: 12 tip, 10 pip
+                // 无名指: 16 tip, 14 pip
+                // 小指: 20 tip, 18 pip
+                let closedFingers = 0;
+                if (landmarks[8].y > landmarks[6].y) closedFingers++;
+                if (landmarks[12].y > landmarks[10].y) closedFingers++;
+                if (landmarks[16].y > landmarks[14].y) closedFingers++;
+                if (landmarks[20].y > landmarks[18].y) closedFingers++;
+                
+                // 拇指判断比较复杂，简化为判断拇指尖是否靠近小指根部
+                // 或者直接忽略拇指，只看四指
+                return closedFingers >= 4; 
+            }
             
             hands.onResults((results) => {
-                // --- 1. 骨骼可视化 (确认 AI 是否工作) ---
-                // 设置画布尺寸与视频一致
                 if(videoElement.videoWidth) {
                     canvasElement.width = videoElement.videoWidth;
                     canvasElement.height = videoElement.videoHeight;
                     canvasCtx.save();
                     canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
                     
-                    if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                    let activeHands = 0;
+                    if (results.multiHandLandmarks) activeHands = results.multiHandLandmarks.length;
+
+                    if (activeHands > 0) {
                         handDetected = true;
+
+                        // [新增] 自动收起侧边栏逻辑
+                        if (!sidebar.classList.contains('collapsed') && !sidebarAutoCloseTimer) {
+                            sidebarAutoCloseTimer = setTimeout(() => {
+                                sidebar.classList.add('collapsed');
+                                sidebarAutoCloseTimer = null; 
+                            }, 3000); // 3秒后收起
+                        }
                         
-                        // 绘制绿色骨骼线
+                        // 绘制骨骼
                         for (const landmarks of results.multiHandLandmarks) {
                             drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, {color: '#00FF00', lineWidth: 4});
                             drawLandmarks(canvasCtx, landmarks, {color: '#FF0000', lineWidth: 2});
                         }
 
-                        // --- 2. 交互逻辑 ---
-                        const lm = results.multiHandLandmarks[0];
-                        // 缩放
-                        const p1 = lm[4], p2 = lm[8]; 
-                        const dist = Math.hypot(p1.x-p2.x, p1.y-p2.y);
-                        // 平板摄像头距离通常较远，dist 数值较小，放大乘数
-                        targetScale = Math.min(Math.max((dist - 0.03) * 18, 0.5), 3.0);
-                        
-                        // 旋转
-                        const wrist = lm[0];
-                        targetRotationY = (wrist.x - 0.5) * 6.0; 
-                        targetRotationX = (wrist.y - 0.5) * 4.0;
+                        // --- 双手握拳重置检测 ---
+                        let fistCount = 0;
+                        let rotationLocked = false;
+
+                        for (let i = 0; i < activeHands; i++) {
+                            const landmarks = results.multiHandLandmarks[i];
+                            const isHandFist = isFist(landmarks);
+                            
+                            if (isHandFist) {
+                                fistCount++;
+                                
+                                // [新增] 左手握拳检测 (用于锁定旋转)
+                                // MediaPipe handedness label "Left" 通常指用户的左手
+                                // 注意：在 mirrored 模式下，左手出现在屏幕右侧，label 仍为 "Left"
+                                if (results.multiHandedness && results.multiHandedness[i].label === 'Left') {
+                                    rotationLocked = true;
+                                }
+                            }
+                        }
+
+                        if (fistCount === 2) {
+                            // 双手握拳 -> 重置状态
+                            targetScale = 1.0;
+                            targetRotationX = 0;
+                            targetRotationY = 0;
+                        } else {
+                            // 单手或双手非握拳交互
+                            // 取第一只手作为主控手
+                            const lm = results.multiHandLandmarks[0];
+                            
+                            // 缩放 (始终响应)
+                            const p1 = lm[4], p2 = lm[8]; 
+                            const dist = Math.hypot(p1.x-p2.x, p1.y-p2.y);
+                            targetScale = Math.min(Math.max((dist - 0.03) * 18, 0.5), 3.0);
+                            
+                            // 旋转 (左手握拳时不响应)
+                            if (!rotationLocked) {
+                                const wrist = lm[0];
+                                targetRotationY = (wrist.x - 0.5) * 6.0; 
+                                targetRotationX = (wrist.y - 0.5) * 4.0;
+                            }
+                        }
+
                     } else {
                         handDetected = false; 
                         targetScale = 1.0;
+                        // 如果手消失了，是否需要清除定时器？
+                        // 逻辑上：手消失了 -> 下次手出现重新计时
+                        if (sidebarAutoCloseTimer) {
+                            clearTimeout(sidebarAutoCloseTimer);
+                            sidebarAutoCloseTimer = null;
+                        }
                     }
                     canvasCtx.restore();
                 }
             });
 
-            // 初始化 Camera Utils
-            // 关键：不锁定 640x480，使用 ideal 让浏览器选择最佳比例
             cameraUtils = new Camera(videoElement, {
                 onFrame: async () => { await hands.send({image: videoElement}); },
                 width: { ideal: 1280 }, 
                 height: { ideal: 720 },
-                facingMode: 'user' // 强制前置
+                facingMode: 'user'
             });
 
             camBtn.addEventListener('click', async () => {
@@ -665,7 +792,7 @@
                         await cameraUtils.start();
                         isCameraActive = true;
                         videoElement.style.display = 'block';
-                        canvasElement.style.display = 'block'; // 显示骨骼层
+                        canvasElement.style.display = 'block';
                         placeholder.style.display = 'none';
                         camBtn.classList.add('active');
                         camText.innerText = '关闭摄像头';
