@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>3D 灵动粒子 - 修复版</title>
-    <!-- vConsole: 方便手机查看报错 -->
+    <title>3D 灵动粒子 - 稳定修复版</title>
+    <!-- 引入 vConsole -->
     <script src="https://unpkg.com/vconsole@latest/dist/vconsole.min.js"></script>
     <script>var vConsole = new VConsole();</script>
     <style>
@@ -160,7 +160,6 @@
 
     <div id="video-container">
         <div id="camera-placeholder"><div class="cam-off-icon">📷⃠</div><div>已关闭</div></div>
-        <!-- 显式添加宽高，这有助于某些浏览器初始化视频流 -->
         <video id="video-feed" width="1280" height="720" playsinline muted autoplay></video>
         <canvas id="output-canvas"></canvas>
     </div>
@@ -306,9 +305,10 @@
         }
 
         async function initAI() {
-            // ★★★ 核心修复：使用 unpkg 源，并锁定版本，解决 CDN 404/MIME 问题 ★★★
+            // ★★★ 核心修复：锁定版本 + 指定 jsDelivr 路径 ★★★
+            // 这个版本非常稳定，且 jsDelivr 缓存良好
             const MP_VERSION = '0.4.1646424915';
-            const BASE_URL = `https://unpkg.com/@mediapipe/hands@${MP_VERSION}`;
+            const BASE_URL = `https://cdn.jsdelivr.net/npm/@mediapipe/hands@${MP_VERSION}`;
 
             try {
                 // 手动加载 JS
@@ -317,6 +317,7 @@
                 console.log("MediaPipe scripts loaded.");
             } catch (e) {
                 console.error("Script load failed:", e);
+                alert("加载 AI 核心组件失败，请检查网络连接");
             }
 
             const videoElement = document.getElementById('video-feed');
@@ -326,9 +327,10 @@
             const camBtn = document.getElementById('cam-toggle-btn');
             const camText = document.getElementById('cam-btn-text');
 
-            // 初始化 Hands，使用 locateFile 指向 unpkg
+            // 初始化 Hands
+            // locateFile 强制指定所有资源去 jsDelivr 下载，解决 streaming compile failed 问题
             hands = new Hands({locateFile: (file) => {
-                // 将 .data, .wasm 等文件的请求重定向到 unpkg
+                console.log("Requesting asset:", file);
                 return `${BASE_URL}/${file}`;
             }});
 
@@ -363,13 +365,13 @@
                 canvasCtx.restore();
             });
 
-            // 手动驱动检测循环
+            // 手动驱动循环
             async function predictWebcam() {
                 if (isCameraActive && videoElement.videoWidth > 0) {
                     try {
                         await hands.send({image: videoElement});
                     } catch (e) {
-                        console.error("Hands send error:", e);
+                        // 忽略偶尔的帧错误
                     }
                 }
                 if (isCameraActive) requestAnimationFrame(predictWebcam);
@@ -385,7 +387,7 @@
                         videoElement.onloadedmetadata = () => {
                             videoElement.play();
                             isCameraActive = true;
-                            predictWebcam(); // 启动循环
+                            predictWebcam(); 
                             videoElement.style.display = 'block';
                             canvasElement.style.display = 'block';
                             placeholder.style.display = 'none';
