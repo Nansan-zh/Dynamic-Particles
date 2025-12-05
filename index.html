@@ -2,8 +2,8 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>灵动粒子 By Haemorr</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>3D 灵动粒子 - 全平台完美版</title>
     <style>
         :root {
             /* 基础变量 */
@@ -13,7 +13,7 @@
             --text-sub: #636e72;
             --primary: #6c5ce7;
             --sidebar-width: 260px;
-            --sidebar-collapsed-width: 72px; /* 稍微加宽一点点以容纳正方形按钮 */
+            --sidebar-collapsed-width: 72px; 
             --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
             --item-hover: rgba(0,0,0,0.06);
             --divider-color: rgba(0,0,0,0.08);
@@ -38,6 +38,8 @@
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             color: var(--text-main);
             transition: color 0.5s ease; 
+            /* 禁止移动端双击缩放 */
+            touch-action: none;
         }
 
         /* --- 背景层 --- */
@@ -92,23 +94,16 @@
         /* 内容区 */
         .sidebar-content {
             flex: 1; padding: 15px; overflow-y: auto; overflow-x: hidden;
-            display: flex; flex-direction: column; 
-            /* 这里的 gap 设为 0，完全由 divider 控制间距 */
-            gap: 0; 
+            display: flex; flex-direction: column; gap: 0; 
         }
         .sidebar-content::-webkit-scrollbar { width: 0; }
 
-        /* --- 分割线 (修复居中问题) --- */
+        /* --- 分割线 (修复居中) --- */
         .divider {
             width: 100%; height: 1px; background: var(--divider-color);
-            margin: 15px 0; flex-shrink: 0;
-            transition: all 0.3s;
+            margin: 15px 0; flex-shrink: 0; transition: all 0.3s;
         }
-        /* 折叠后：变成短线，且利用 margin auto 绝对居中 */
-        #sidebar.collapsed .divider { 
-            width: 24px; 
-            margin: 15px auto; 
-        } 
+        #sidebar.collapsed .divider { width: 24px; margin: 15px auto; } 
 
         /* 控件组 */
         .control-group { display: flex; flex-direction: column; gap: 10px; }
@@ -123,80 +118,56 @@
         #sidebar.collapsed .group-header:hover { background: var(--item-hover); }
         .group-label { white-space: nowrap; transition: opacity 0.2s; }
         
-        /* 图标容器：统一宽度，确保文字对齐 */
+        /* 图标容器：确保所有图标左对齐一致 */
         .icon-box {
             width: 32px; display: flex; justify-content: center; align-items: center;
-            font-size: 1rem; flex-shrink: 0;
+            font-size: 1rem; flex-shrink: 0; margin-right: 4px;
         }
-        
+        #sidebar.collapsed .icon-box { margin-right: 0; }
         #sidebar.collapsed .group-label { display: none; }
 
         /* --- 摄像头总开关按钮 (完美对齐版) --- */
         .cam-switch-btn {
-            width: 100%; 
-            height: 42px; /* 固定高度，与下方形状按钮一致 */
-            padding: 0 12px; /* 与下方形状按钮一致的内边距 */
-            border-radius: 12px;
-            border: 1px solid var(--glass-border);
+            width: 100%; height: 42px; padding: 0 12px;
+            border-radius: 12px; border: 1px solid var(--glass-border);
             background: var(--item-hover); color: var(--text-main);
-            cursor: pointer; 
-            display: flex; align-items: center; /* 垂直居中 */
-            gap: 0; /* 间距由 icon-box 控制 */
+            cursor: pointer; display: flex; align-items: center;
             transition: all 0.2s; font-size: 0.9rem; font-weight: 600;
-            box-sizing: border-box; /* 包含边框 */
+            box-sizing: border-box;
         }
         .cam-switch-btn.active { background: rgba(0, 184, 148, 0.15); color: #00b894; border-color: #00b894; }
         .cam-switch-btn:hover { transform: translateY(-1px); }
 
-        /* 专门的图标容器，确保与下方的 icon-box 对齐 */
         .cam-icon-wrapper {
-            width: 32px; /* 与下方 .shape-icon 的容器宽度一致 (min-width: 24 + gap) */
-            display: flex; justify-content: center; align-items: center;
-            font-size: 1.1rem; flex-shrink: 0;
-            margin-right: 4px; /* 微调与文字间距 */
+            width: 32px; display: flex; justify-content: center; align-items: center;
+            font-size: 1.1rem; flex-shrink: 0; margin-right: 4px;
         }
-        /* 修复文字垂直对齐 */
-        .cam-text { line-height: 1; padding-top: 1px; }
+        .cam-text { line-height: 1; padding-top: 1px; white-space: nowrap; }
 
-        /* 折叠后的样式：圆角正方形，图标居中 */
-        #sidebar.collapsed .cam-switch-btn {
-            width: 42px; /* 宽度 = 高度 */
-            padding: 0; /* 移除内边距 */
-            justify-content: center; /* 水平居中 */
-            margin: 0 auto; /* 在侧边栏中居中 */
-        }
-        #sidebar.collapsed .cam-icon-wrapper { margin-right: 0; } /* 移除间距 */
+        #sidebar.collapsed .cam-switch-btn { width: 42px; padding: 0; justify-content: center; margin: 0 auto; }
+        #sidebar.collapsed .cam-icon-wrapper { margin-right: 0; }
         #sidebar.collapsed .cam-text { display: none; }
-
 
         /* --- 形状按钮 --- */
         .shape-list { display: flex; flex-direction: column; gap: 6px; }
         .shape-btn {
-            display: flex; align-items: center; 
-            height: 42px; 
-            padding: 0 12px;
+            display: flex; align-items: center; height: 42px; padding: 0 12px;
             border: none; background: transparent; color: var(--text-main);
             border-radius: 12px; cursor: pointer; transition: all 0.2s;
-            font-size: 0.95rem; overflow: hidden; text-align: left;
-            box-sizing: border-box;
+            font-size: 0.95rem; overflow: hidden; text-align: left; box-sizing: border-box;
         }
         .shape-btn:hover { background: var(--item-hover); }
         .shape-btn.active {
             background: var(--primary); color: var(--active-text);
             box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-weight: 600;
         }
-        /* 形状图标容器，确保左对齐统一 */
         .shape-icon { 
-            width: 32px; /* 固定宽度 */
-            display: flex; justify-content: center; align-items: center; 
-            font-size: 1.2rem; flex-shrink: 0;
-            margin-right: 4px;
+            width: 32px; display: flex; justify-content: center; align-items: center; 
+            font-size: 1.2rem; flex-shrink: 0; margin-right: 4px;
         }
         .shape-text { white-space: nowrap; line-height: 1; padding-top: 1px;}
         
-        #sidebar.collapsed .shape-btn { 
-            width: 42px; padding: 0; justify-content: center; margin: 0 auto;
-        }
+        #sidebar.collapsed .shape-btn { width: 42px; padding: 0; justify-content: center; margin: 0 auto; }
         #sidebar.collapsed .shape-icon { margin-right: 0; }
         #sidebar.collapsed .shape-text { display: none; }
 
@@ -233,16 +204,25 @@
         /* 摄像头容器与占位符 */
         #video-container {
             position: fixed; bottom: 20px; right: 20px;
-            width: 140px; height: 105px; z-index: 10;
+            width: 160px; height: 120px; z-index: 10;
         }
         #video-feed {
+            position: absolute; top: 0; left: 0;
             width: 100%; height: 100%;
             border-radius: 16px; object-fit: cover; transform: scaleX(-1);
             border: 3px solid var(--primary); box-shadow: var(--shadow);
-            opacity: 0.9; transition: opacity 0.3s;
-            display: none; 
-            background: #000;
+            opacity: 0.9; 
+            display: none; background: #000;
         }
+        /* 新增：骨骼绘制层 */
+        #output-canvas {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
+            border-radius: 16px; object-fit: cover; transform: scaleX(-1);
+            pointer-events: none; z-index: 11;
+            display: none; /* 默认隐藏 */
+        }
+        
         #camera-placeholder {
             width: 100%; height: 100%;
             border-radius: 16px; background: rgba(0,0,0,0.1);
@@ -365,7 +345,9 @@
             <div class="cam-off-icon">📷⃠</div>
             <div>已关闭</div>
         </div>
-        <video id="video-feed" playsinline></video>
+        <!-- 关键：muted autoplay 用于兼容安卓/iOS 自动播放策略 -->
+        <video id="video-feed" playsinline muted autoplay></video>
+        <canvas id="output-canvas"></canvas>
     </div>
     
     <div id="canvas-container"></div>
@@ -382,7 +364,10 @@
 
         // 全局变量
         let scene, camera, renderer, particles, geometry, material;
-        const particleCount = 20000;
+        // 性能适配：手机端减少粒子数量
+        const isMobileDevice = window.innerWidth < 768;
+        const particleCount = isMobileDevice ? 8000 : 22000;
+        
         let isDarkMode = false;
         
         // 交互状态
@@ -601,38 +586,75 @@
             });
         }
 
-        // --- AI 与 摄像头核心逻辑 ---
+        // --- AI 与 摄像头核心逻辑 (全平台适配版) ---
         async function initAI() {
             await loadScript('https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js');
             await loadScript('https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js');
+            await loadScript('https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js'); // 用于绘制骨骼
             await loadScript('https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js');
 
             const videoElement = document.getElementById('video-feed');
+            const canvasElement = document.getElementById('output-canvas');
+            const canvasCtx = canvasElement.getContext('2d');
+            
             const placeholder = document.getElementById('camera-placeholder');
             const camBtn = document.getElementById('cam-toggle-btn');
             const camText = document.getElementById('cam-btn-text');
 
             const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
-            hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
+            
+            hands.setOptions({
+                maxNumHands: 1,
+                modelComplexity: 1, 
+                minDetectionConfidence: 0.4, // 降低门槛适配平板
+                minTrackingConfidence: 0.5
+            });
             
             hands.onResults((results) => {
-                if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-                    handDetected = true;
-                    const lm = results.multiHandLandmarks[0];
-                    const p1 = lm[4], p2 = lm[8]; // 缩放
-                    const dist = Math.hypot(p1.x-p2.x, p1.y-p2.y);
-                    targetScale = Math.min(Math.max((dist - 0.05) * 15, 0.5), 3.0);
-                    const wrist = lm[0]; // 旋转
-                    targetRotationY = (wrist.x - 0.5) * 5.0; 
-                    targetRotationX = (wrist.y - 0.5) * 3.0;
-                } else {
-                    handDetected = false; targetScale = 1.0;
+                // --- 1. 骨骼可视化 (确认 AI 是否工作) ---
+                // 设置画布尺寸与视频一致
+                if(videoElement.videoWidth) {
+                    canvasElement.width = videoElement.videoWidth;
+                    canvasElement.height = videoElement.videoHeight;
+                    canvasCtx.save();
+                    canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+                    
+                    if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                        handDetected = true;
+                        
+                        // 绘制绿色骨骼线
+                        for (const landmarks of results.multiHandLandmarks) {
+                            drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, {color: '#00FF00', lineWidth: 4});
+                            drawLandmarks(canvasCtx, landmarks, {color: '#FF0000', lineWidth: 2});
+                        }
+
+                        // --- 2. 交互逻辑 ---
+                        const lm = results.multiHandLandmarks[0];
+                        // 缩放
+                        const p1 = lm[4], p2 = lm[8]; 
+                        const dist = Math.hypot(p1.x-p2.x, p1.y-p2.y);
+                        // 平板摄像头距离通常较远，dist 数值较小，放大乘数
+                        targetScale = Math.min(Math.max((dist - 0.03) * 18, 0.5), 3.0);
+                        
+                        // 旋转
+                        const wrist = lm[0];
+                        targetRotationY = (wrist.x - 0.5) * 6.0; 
+                        targetRotationX = (wrist.y - 0.5) * 4.0;
+                    } else {
+                        handDetected = false; 
+                        targetScale = 1.0;
+                    }
+                    canvasCtx.restore();
                 }
             });
 
+            // 初始化 Camera Utils
+            // 关键：不锁定 640x480，使用 ideal 让浏览器选择最佳比例
             cameraUtils = new Camera(videoElement, {
                 onFrame: async () => { await hands.send({image: videoElement}); },
-                width: 640, height: 480
+                width: { ideal: 1280 }, 
+                height: { ideal: 720 },
+                facingMode: 'user' // 强制前置
             });
 
             camBtn.addEventListener('click', async () => {
@@ -641,11 +663,12 @@
                         await cameraUtils.start();
                         isCameraActive = true;
                         videoElement.style.display = 'block';
+                        canvasElement.style.display = 'block'; // 显示骨骼层
                         placeholder.style.display = 'none';
                         camBtn.classList.add('active');
                         camText.innerText = '关闭摄像头';
                     } catch(e) {
-                        alert("无法启动摄像头，请检查权限");
+                        alert("摄像头启动失败：\n1.请确保使用 HTTPS\n2.请允许浏览器访问相机");
                         console.error(e);
                     }
                 } else {
@@ -654,6 +677,7 @@
                     if (stream) { stream.getTracks().forEach(track => track.stop()); videoElement.srcObject = null; }
                     isCameraActive = false; handDetected = false; targetScale = 1.0;
                     videoElement.style.display = 'none';
+                    canvasElement.style.display = 'none';
                     placeholder.style.display = 'flex';
                     camBtn.classList.remove('active');
                     camText.innerText = '开启摄像头控制';
