@@ -1,4 +1,4 @@
-# ✨ 3D Dynamic Particles | 3D 灵动粒子 · 智控终极版
+# ✨ 3D Dynamic Particles | 灵动粒子 基于Gemini的集大成作
 
 > **以手势为笔，以粒子为墨，在浏览器中触碰三维数学之美。**
 > *Touch the beauty of 3D mathematics in your browser, using gestures as your pen and particles as your ink.*
@@ -15,6 +15,8 @@
 
 本项目实现了全平台兼容（PC/平板/手机），并针对移动端 GPU 进行了深度性能优化，提供丝滑的 60FPS 体验。
 
+现已部署在https://haemorr.online/ 欢迎访问
+
 ## 🌟 核心亮点 (Key Features)
 
 ### 1. 🤖 次世代 AI 手势交互
@@ -23,7 +25,7 @@
 *   **✋ 3D 旋转**：移动手腕位置，全方位观察模型细节。
 *   **✊ 轴向锁定**：**左手握拳**时，自动锁定旋转轴，仅允许精细缩放操作。
 *   **🙌 双拳重置**：**双手同时握拳**，模型瞬间回归初始状态，交互零延迟。
-*   **🧠 智能 UI**：识别到操作手势 3 秒后，侧边栏自动收起，提供沉浸式视觉体验。
+*   **🧠 智能侧边栏UI**：识别到操作手势 3 秒后，侧边栏自动收起，提供沉浸式视觉体验。
 
 ### 2. 🎨 数学驱动的粒子艺术
 拒绝贴图堆砌，每一个形态都由纯粹的数学公式生成：
@@ -48,10 +50,7 @@
 
 ## 🚀 快速开始 (Getting Started)
 
-1.  克隆仓库：
-    ```bash
-    git clone https://github.com/your-username/your-repo-name.git
-    ```
+1.  完全开源 喜欢的话给个star吧
 2.  使用 Live Server 或任意静态服务器打开 `index.html`。
 3.  **注意**：由于浏览器安全策略，调用摄像头必须使用 `https://` 协议或 `localhost`。
 
@@ -65,4 +64,4 @@
 
 ---
 
-**Made with ❤️ by [Your Name]**
+**Made with ❤️ by Haemorr**
